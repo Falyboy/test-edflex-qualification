@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module E-Learning — Formation IA Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0A0A0A; color: #E0E0E0; font-family: system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.6; padding: 2rem; }
+    .page { max-width: 860px; margin: 0 auto; }
+    header { border-bottom: 1px solid #222; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    header .badge { display: inline-block; background: #FF6500; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .25rem .7rem; border-radius: 4px; margin-bottom: .75rem; }
+    header h1 { font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: .35rem; }
+    header p { color: #888; font-size: .95rem; }
+    .section { background: #161616; border: 1px solid #222; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.25rem; }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #FF6500; margin-bottom: .6rem; }
+    .section p, .section li { color: #C0C0C0; font-size: .92rem; }
+    .section ul { padding-left: 1.2rem; }
+    .section ul li { margin-bottom: .3rem; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .tag { display: inline-block; background: #1E1E1E; border: 1px solid #333; color: #aaa; font-size: .8rem; padding: .15rem .6rem; border-radius: 4px; margin: .15rem .1rem; }
+    .tag-orange { background: #2a1500; border-color: #FF6500; color: #FF6500; }
+    table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+    th { text-align: left; font-size: .8rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .07em; padding: .5rem .75rem; border-bottom: 1px solid #222; }
+    td { padding: .6rem .75rem; border-bottom: 1px solid #1a1a1a; font-size: .9rem; color: #C0C0C0; vertical-align: top; }
+
+    /* Sources */
+    .source-row { display: flex; align-items: center; gap: .75rem; background: #111; border: 1px solid #222; border-radius: 8px; padding: .75rem 1rem; margin-bottom: .6rem; }
+    .source-priority { display: inline-block; font-size: .7rem; font-weight: 700; padding: .1rem .5rem; border-radius: 3px; }
+    .p1 { background: #FF6500; color: #fff; }
+    .p2 { background: #333; color: #aaa; }
+    .p3 { background: #222; color: #666; }
+    .p4 { background: #1a1a1a; color: #555; }
+    .source-name { font-weight: 600; color: #fff; font-size: .88rem; }
+    .source-desc { font-size: .8rem; color: #666; }
+
+    /* OPAD cards */
+    .opad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: .75rem; }
+    .opad-card { background: #111; border-radius: 8px; padding: 1rem; border-top: 3px solid #FF6500; }
+    .opad-letter { font-size: 2rem; font-weight: 900; color: #FF6500; line-height: 1; }
+    .opad-name { font-size: .9rem; font-weight: 700; color: #fff; margin: .3rem 0 .4rem; }
+    .opad-desc { font-size: .82rem; color: #888; }
+    .opad-rule { font-size: .78rem; color: #FF6500; margin-top: .5rem; font-style: italic; }
+
+    /* Stade */
+    .stade-row { display: flex; gap: .75rem; margin-top: .5rem; }
+    .stade-card { flex: 1; background: #111; border: 1px solid #222; border-radius: 8px; padding: .75rem; text-align: center; }
+    .stade-num { font-size: 1.4rem; font-weight: 800; color: #FF6500; }
+    .stade-bloom { font-size: .75rem; color: #aaa; margin-top: .2rem; }
+
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .75rem; }
+    .check-item { background: #111; border: 1px solid #222; border-radius: 6px; padding: .6rem .9rem; font-size: .85rem; color: #aaa; display: flex; align-items: center; gap: .5rem; }
+    .check-item::before { content: '○'; color: #555; font-size: 1rem; flex-shrink: 0; }
+    footer { text-align: center; color: #444; font-size: .8rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1a1a1a; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="badge">Livrable #5 — Contenu pédagogique</div>
+    <h1>Module E-Learning</h1>
+    <p>Module de formation IA structuré selon le framework OPAD — nourri par les sources qualifiées, le Parcours Blended et la Maquette Pédagogique du projet.</p>
+  </header>
+
+  <div class="section">
+    <div class="section-label">Sources (priorité décroissante)</div>
+    <div class="source-row">
+      <span class="source-priority p1">1</span>
+      <div><div class="source-name">Brief E-Learning — Parcours Blended (#4)</div><div class="source-desc">Identifie quel module produire, le moment (Explorer / Enrichir) et la fonction pédagogique</div></div>
+    </div>
+    <div class="source-row">
+      <span class="source-priority p2">2</span>
+      <div><div class="source-name">Maquette Pédagogique (#2)</div><div class="source-desc">Objectifs Bloom, public cible, prérequis, durée — aligne le module sur le cadre global</div></div>
+    </div>
+    <div class="source-row">
+      <span class="source-priority p3">3</span>
+      <div><div class="source-name">Sources qualifiées</div><div class="source-desc">Transcripts YouTube / Podcast / Google Drive — max 5, tronquées à 8 000 chars chacune</div></div>
+    </div>
+    <div class="source-row">
+      <span class="source-priority p4">4</span>
+      <div><div class="source-name">Paramètres manuels</div><div class="source-desc">Thème, persona, stade, durée, département — fallback si aucun contexte projet disponible</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Framework OPAD — 4 sections obligatoires dans cet ordre</div>
+    <div class="opad-grid">
+      <div class="opad-card">
+        <div class="opad-letter">O</div>
+        <div class="opad-name">Objectif</div>
+        <div class="opad-desc">1 objectif Bloom adapté au stade. Format : "À l'issue de ce module, [public] sera capable de [verbe] [compétence] dans [contexte]".</div>
+        <div class="opad-rule">Si Maquette disponible → aligner obligatoirement sur ses objectifs.</div>
+      </div>
+      <div class="opad-card">
+        <div class="opad-letter">P</div>
+        <div class="opad-name">Pratique</div>
+        <div class="opad-desc">Exercice guidé pas-à-pas en autonomie. 30–50% de la durée totale. Si Explorer → découverte. Si Enrichir → ancrage post-salle.</div>
+        <div class="opad-rule">Utiliser exemples tirés des sources qualifiées.</div>
+      </div>
+      <div class="opad-card">
+        <div class="opad-letter">A</div>
+        <div class="opad-name">Ancrage</div>
+        <div class="opad-desc">Cas concret métier issu du secteur et du public cible. Ancré dans une situation terrain réelle (deskless workers, smartphone).</div>
+        <div class="opad-rule">Extraire un extrait du transcript si disponible.</div>
+      </div>
+      <div class="opad-card">
+        <div class="opad-letter">D</div>
+        <div class="opad-name">Déploiement</div>
+        <div class="opad-desc">1 action concrète terrain dans les 24–48h suivant le module. Format : verbe + objet + contexte + résultat attendu.</div>
+        <div class="opad-rule">Si Enrichir → prolonge ce qui a été fait en salle.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Adaptation par stade maturité IA</div>
+    <div class="stade-row">
+      <div class="stade-card"><div class="stade-num">1</div><div class="stade-bloom">Bloom 1 — Mémoriser</div><div style="font-size:.75rem;color:#666;margin-top:.3rem">Vulgariser chaque terme technique</div></div>
+      <div class="stade-card"><div class="stade-num">2</div><div class="stade-bloom">Bloom 2 — Comprendre</div><div style="font-size:.75rem;color:#666;margin-top:.3rem">Exemples concrets métier</div></div>
+      <div class="stade-card"><div class="stade-num">3</div><div class="stade-bloom">Bloom 3 — Appliquer</div><div style="font-size:.75rem;color:#666;margin-top:.3rem">Cas d'usage réels terrain</div></div>
+      <div class="stade-card"><div class="stade-num">4</div><div class="stade-bloom">Bloom 4 — Analyser</div><div style="font-size:.75rem;color:#666;margin-top:.3rem">Personnalisation workflow</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Évaluation finale (obligatoire)</div>
+    <p>3 questions max — QCM ou Vrai/Faux — avec feedback immédiat par réponse.</p>
+    <p style="margin-top:.5rem;font-size:.85rem;color:#888;">Si Questionnaire de positionnement disponible : aligner les questions pour mesurer la progression entre avant et après formation (ROI pédagogique Qualiopi).</p>
+  </div>
+
+  <div class="grid2">
+    <div class="section">
+      <div class="section-label">Agent & LLM</div>
+      <p><span class="tag tag-orange">AGENT_CONTENU</span></p>
+      <p style="margin-top:.75rem;font-size:.85rem;color:#888;">DeepSeek — contexte projet complet</p>
+      <p style="margin-top:.4rem;font-size:.85rem;color:#888;">Groq (ancien) → DeepSeek (enrichi)</p>
+    </div>
+    <div class="section">
+      <div class="section-label">Moments compatibles</div>
+      <p><span class="tag">Explorer</span><span class="tag">Enrichir</span><span class="tag">Autonome</span></p>
+      <p style="margin-top:.75rem;font-size:.82rem;color:#888;">Le moment est détecté depuis le brief Parcours Blended et influence la structure P et D.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Contrôle qualité</div>
+    <div class="check-grid">
+      <div class="check-item">4 sections OPAD présentes et dans l'ordre</div>
+      <div class="check-item">Objectif Bloom aligné au stade maturité</div>
+      <div class="check-item">Sources qualifiées utilisées dans P ou A</div>
+      <div class="check-item">Durée exercice 30–50% du module</div>
+      <div class="check-item">Action terrain D précise et réalisable J+1</div>
+      <div class="check-item">Évaluation 3 questions avec feedback</div>
+      <div class="check-item">Zéro jargon non expliqué (stade 1)</div>
+      <div class="check-item">RGPD — pas de données personnelles réelles</div>
+    </div>
+  </div>
+
+  <footer>
+    Formation IA Studio — Livrable #5 · Module E-Learning · Contenu pédagogique
+  </footer>
+
+</div>
+</body>
+</html>

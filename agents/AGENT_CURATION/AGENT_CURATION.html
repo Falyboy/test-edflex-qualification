@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fiche Outil IA — Formation IA Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0A0A0A; color: #E0E0E0; font-family: system-ui, -apple-system, sans-serif; font-size: 15px; line-height: 1.6; padding: 2rem; }
+    .page { max-width: 860px; margin: 0 auto; }
+    header { border-bottom: 1px solid #222; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    header .badge { display: inline-block; background: #FF6500; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .25rem .7rem; border-radius: 4px; margin-bottom: .75rem; }
+    header h1 { font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: .35rem; }
+    header p { color: #888; font-size: .95rem; }
+    .section { background: #161616; border: 1px solid #222; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.25rem; }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #FF6500; margin-bottom: .6rem; }
+    .section p, .section li { color: #C0C0C0; font-size: .92rem; }
+    .section ul { padding-left: 1.2rem; }
+    .section ul li { margin-bottom: .3rem; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .tag { display: inline-block; background: #1E1E1E; border: 1px solid #333; color: #aaa; font-size: .8rem; padding: .15rem .6rem; border-radius: 4px; margin: .15rem .1rem; }
+    .tag-orange { background: #2a1500; border-color: #FF6500; color: #FF6500; }
+    table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+    th { text-align: left; font-size: .8rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .07em; padding: .5rem .75rem; border-bottom: 1px solid #222; }
+    td { padding: .6rem .75rem; border-bottom: 1px solid #1a1a1a; font-size: .9rem; color: #C0C0C0; vertical-align: top; }
+    .source-row { display: flex; align-items: center; gap: .75rem; background: #111; border: 1px solid #222; border-radius: 8px; padding: .75rem 1rem; margin-bottom: .6rem; }
+    .source-priority { display: inline-block; font-size: .7rem; font-weight: 700; padding: .1rem .5rem; border-radius: 3px; }
+    .p1 { background: #FF6500; color: #fff; }
+    .p2 { background: #333; color: #aaa; }
+    .p3 { background: #222; color: #666; }
+    .source-name { font-weight: 600; color: #fff; font-size: .88rem; }
+    .source-desc { font-size: .8rem; color: #666; }
+    .output-block { background: #111; border-left: 3px solid #FF6500; padding: .75rem 1rem; border-radius: 0 6px 6px 0; margin-bottom: .6rem; font-size: .9rem; }
+    .output-block .num { display: inline-block; background: #FF6500; color: #fff; font-size: .7rem; font-weight: 700; padding: .1rem .5rem; border-radius: 3px; margin-bottom: .3rem; }
+    .conformite-card { background: #111; border: 1px solid #222; border-radius: 8px; padding: 1rem; }
+    .conformite-card .title { font-weight: 700; font-size: .85rem; margin-bottom: .4rem; }
+    .ok { color: #22c55e; }
+    .warn { color: #f59e0b; }
+    .ko { color: #ef4444; }
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .75rem; }
+    .check-item { background: #111; border: 1px solid #222; border-radius: 6px; padding: .6rem .9rem; font-size: .85rem; color: #aaa; display: flex; align-items: center; gap: .5rem; }
+    .check-item::before { content: '○'; color: #555; font-size: 1rem; flex-shrink: 0; }
+    footer { text-align: center; color: #444; font-size: .8rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1a1a1a; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="badge">Livrable #6 — Contenu pédagogique</div>
+    <h1>Fiche Outil IA</h1>
+    <p>Guide pratique remis à l'apprenant — utilisable immédiatement sur le terrain, avec cas d'usage réels, tuto première utilisation et conformité RGPD/IA Act.</p>
+  </header>
+
+  <div class="section">
+    <div class="section-label">Sources (priorité décroissante)</div>
+    <div class="source-row">
+      <span class="source-priority p1">1</span>
+      <div><div class="source-name">Maquette Pédagogique (#2)</div><div class="source-desc">Secteur, public cible, stade maturité, outils mentionnés (Q6)</div></div>
+    </div>
+    <div class="source-row">
+      <span class="source-priority p2">2</span>
+      <div><div class="source-name">Sources qualifiées</div><div class="source-desc">Transcripts YouTube / Podcast / Google Drive — extraire cas d'usage réels si l'outil y est mentionné. Max 3 sources, 4 000 chars chacune</div></div>
+    </div>
+    <div class="source-row">
+      <span class="source-priority p3">3</span>
+      <div><div class="source-name">Paramètres manuels</div><div class="source-desc">Nom outil, cas d'usage, département, stade — fallback si aucun contexte disponible</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Structure de la fiche — 6 sections</div>
+    <div class="output-block">
+      <span class="num">Section 1</span><br>
+      <strong style="color:#fff;">En une phrase</strong> — ce que fait l'outil + à qui ça sert (20 mots max, zéro jargon)
+    </div>
+    <div class="output-block">
+      <span class="num">Section 2</span><br>
+      <strong style="color:#fff;">Cas d'usage terrain (3 max)</strong> — situation réelle → action concrète → résultat mesurable. Au moins 1 cas extrait des sources qualifiées si disponibles
+    </div>
+    <div class="output-block">
+      <span class="num">Section 3</span><br>
+      <strong style="color:#fff;">Première utilisation — 5 étapes max</strong> — tuto actionnable avec durée estimée de prise en main
+    </div>
+    <div class="output-block">
+      <span class="num">Section 4</span><br>
+      <strong style="color:#fff;">Ce que l'outil ne fait PAS</strong> — 3 limites concrètes pour éviter les mauvaises surprises terrain
+    </div>
+    <div class="output-block">
+      <span class="num">Section 5</span><br>
+      <strong style="color:#fff;">Conformité RGPD / IA Act</strong> — tableau statut + détail + alternative RGPD-safe si risque
+    </div>
+    <div class="output-block">
+      <span class="num">Section 6</span><br>
+      <strong style="color:#fff;">Niveau requis</strong> — Débutant / Intermédiaire / Avancé + temps de prise en main estimé
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Conformité — tableau obligatoire</div>
+    <div class="grid2" style="margin-top:.5rem">
+      <div class="conformite-card">
+        <div class="title ok">✅ RGPD Conforme</div>
+        <p style="font-size:.82rem;color:#888;">Données traitées sur serveurs UE, politique claire, pas de transfert hors UE sans garanties.</p>
+      </div>
+      <div class="conformite-card">
+        <div class="title warn">⚠️ RGPD Vigilance</div>
+        <p style="font-size:.82rem;color:#888;">Données traitées hors UE ou politique floue. Alternative RGPD-safe proposée automatiquement.</p>
+      </div>
+    </div>
+    <p style="margin-top:.75rem;font-size:.82rem;color:#666;">IA Act : signaler si l'outil prend des décisions automatisées affectant des personnes (Annexe III — système à haut risque).</p>
+  </div>
+
+  <div class="grid2">
+    <div class="section">
+      <div class="section-label">Agent & LLM</div>
+      <p><span class="tag tag-orange">AGENT_CURATION</span></p>
+      <p style="margin-top:.75rem;font-size:.85rem;color:#888;">DeepSeek — contexte Maquette + Sources</p>
+    </div>
+    <div class="section">
+      <div class="section-label">Adaptation stade</div>
+      <p style="font-size:.85rem;color:#C0C0C0;">Stade 1 → vulgariser chaque terme technique dès la première apparition.</p>
+      <p style="margin-top:.4rem;font-size:.85rem;color:#C0C0C0;">Stade 3-4 → cas d'usage avancés, intégration workflow.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Contrôle qualité</div>
+    <div class="check-grid">
+      <div class="check-item">En une phrase — max 20 mots</div>
+      <div class="check-item">3 cas terrain avec résultats mesurables</div>
+      <div class="check-item">Tuto ≤ 5 étapes avec durée estimée</div>
+      <div class="check-item">Limites explicites (ce que l'outil ne fait pas)</div>
+      <div class="check-item">Tableau conformité RGPD + IA Act</div>
+      <div class="check-item">Zéro credentials ni données personnelles</div>
+    </div>
+  </div>
+
+  <footer>
+    Formation IA Studio — Livrable #6 · Fiche Outil IA · Contenu pédagogique
+  </footer>
+
+</div>
+</body>
+</html>
