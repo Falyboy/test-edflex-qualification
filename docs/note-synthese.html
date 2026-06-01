@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Note Synthèse — Edflex Qualification</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0A0A0A; color:#E0E0E0; font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; padding:56px 24px; }
+
+.page { max-width:720px; margin:0 auto; }
+
+header { margin-bottom:48px; border-bottom:1px solid #1e1e1e; padding-bottom:28px; }
+header .label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.14em; color:#FF6500; margin-bottom:10px; }
+header h1 { font-size:1.45rem; font-weight:700; color:#fff; line-height:1.3; }
+header .meta { margin-top:10px; font-size:.78rem; color:#555; }
+header .meta span { color:#888; }
+
+section { margin-bottom:40px; }
+h2 { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#FF6500; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid #1a1a1a; }
+
+p { font-size:.87rem; line-height:1.8; color:#C0C0C0; margin-bottom:10px; }
+p strong { color:#E0E0E0; }
+
+ul { padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+ul li { font-size:.85rem; line-height:1.7; color:#C0C0C0; padding-left:18px; position:relative; }
+ul li::before { content:'—'; position:absolute; left:0; color:#FF6500; font-weight:700; }
+ul li strong { color:#E0E0E0; }
+
+/* Archi grid */
+.archi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+.archi-card { background:#161616; border:1px solid #222; border-radius:8px; padding:14px 16px; }
+.archi-card .role { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#555; margin-bottom:6px; }
+.archi-card .tech { font-size:.82rem; font-weight:600; color:#E0E0E0; margin-bottom:4px; }
+.archi-card .detail { font-size:.72rem; color:#666; line-height:1.4; }
+
+/* Séparation layers */
+.sep-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.sep-pill { background:#0a0f1e; border:1px solid #1e3a6e; border-radius:20px; padding:5px 13px; font-size:.72rem; color:#93bbff; font-weight:500; }
+.sep-pill.orange { background:#1a1108; border-color:#FF650055; color:#FF6500; }
+.sep-pill.purple { background:#130d1a; border-color:#7c3aed55; color:#a78bfa; }
+.sep-pill.green  { background:#0a1a10; border-color:#16a34a55; color:#86efac; }
+.sep-pill.gray   { background:#111; border-color:#333; color:#888; }
+
+/* Coûts table */
+.cost-table { width:100%; border-collapse:collapse; margin-bottom:10px; }
+.cost-table th { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#555; text-align:left; padding:8px 12px; border-bottom:1px solid #1e1e1e; }
+.cost-table td { font-size:.8rem; color:#C0C0C0; padding:9px 12px; border-bottom:1px solid #111; }
+.cost-table tr:last-child td { border-bottom:none; }
+.cost-table td:last-child { text-align:right; color:#E0E0E0; font-weight:600; }
+.cost-table .total td { color:#FF6500; font-weight:700; border-top:1px solid #222; }
+
+/* Scale bullets */
+.scale-item { background:#161616; border:1px solid #222; border-radius:8px; padding:14px 16px; margin-bottom:8px; display:flex; gap:14px; align-items:flex-start; }
+.scale-n { font-size:.9rem; font-weight:800; color:#FF6500; flex-shrink:0; width:20px; }
+.scale-body .title { font-size:.82rem; font-weight:600; color:#E0E0E0; margin-bottom:4px; }
+.scale-body .desc { font-size:.77rem; color:#888; line-height:1.55; }
+
+/* Compliance */
+.compliance-row { display:flex; flex-direction:column; gap:8px; }
+.comp-item { display:flex; gap:12px; align-items:flex-start; background:#161616; border:1px solid #222; border-radius:8px; padding:12px 14px; }
+.comp-badge { font-size:.65rem; font-weight:700; border-radius:6px; padding:3px 10px; white-space:nowrap; flex-shrink:0; }
+.comp-badge.red { background:#1a0a0a; border:1px solid #dc262655; color:#f87171; }
+.comp-badge.orange { background:#1a1108; border:1px solid #FF650055; color:#FF6500; }
+.comp-badge.blue { background:#0d1526; border:1px solid #2563eb55; color:#93bbff; }
+.comp-body { font-size:.78rem; color:#C0C0C0; line-height:1.55; }
+.comp-body strong { color:#E0E0E0; }
+
+footer { margin-top:56px; padding-top:20px; border-top:1px solid #1a1a1a; font-size:.72rem; color:#444; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="label">Cas pratique · Option B — Système agentique</div>
+    <h1>Note de synthèse — Pipeline Edflex Qualification</h1>
+    <div class="meta"><span>Tody Rafalimanana</span> · Juin 2026</div>
+  </header>
+
+  <!-- ══ ARCHITECTURE ══ -->
+  <section>
+    <h2>Architecture choisie</h2>
+    <p>J'ai choisi l'<strong>Option B — système agentique</strong>. Ce qui m'a motivé dans ce choix, c'est d'abord mon intérêt grandissant pour les agents et les systèmes agentiques, et plus anciennement pour les architectures structurées. Au-delà de ça, cette approche offre plusieurs avantages concrets par rapport à une automatisation type Make :</p>
+    <ul style="margin:12px 0 14px;">
+      <li><strong>Moins déterministe</strong> — prend mieux en compte les contextes et les cas ambigus</li>
+      <li><strong>Plus scalable</strong> — les agents s'ajoutent sans refondre le pipeline</li>
+      <li><strong>Plus résilient</strong> — les cas imprévus sont gérés dans la logique, pas contournés</li>
+      <li><strong>Plus facile à modifier</strong> — prompts externalisés en fichiers .md, swappables sans redéploiement</li>
+    </ul>
+
+    <div class="archi-grid">
+      <div class="archi-card">
+        <div class="role">Orchestration</div>
+        <div class="tech">n8n + /api/poll</div>
+        <div class="detail">Poll Notion toutes les 2 min · webhook sécurisé x-n8n-secret · verrou Redis idempotency TTL 5 min (évite les doublons en cas de re-run)</div>
+      </div>
+      <div class="archi-card">
+        <div class="role">État &amp; sessions</div>
+        <div class="tech">Upstash Redis</div>
+        <div class="detail">Tokens OAuth Notion + Google · quotas · projets · verrous · résultats transitoires</div>
+      </div>
+      <div class="archi-card">
+        <div class="role">Qualification LLM</div>
+        <div class="tech">DeepSeek · scorer-llm.ts</div>
+        <div class="detail">Temperature 0 · JSON strict · 8 axes OPAD + 3 gates conformité · prompt externalisé en constantes TypeScript</div>
+      </div>
+      <div class="archi-card">
+        <div class="role">Génération livrables</div>
+        <div class="tech">Groq · 6 agents .md</div>
+        <div class="detail">Prompts chargés au runtime (fs.readFile) · séparés du code · swappables sans redéploiement</div>
+      </div>
+      <div class="archi-card">
+        <div class="role">Données utilisateur</div>
+        <div class="tech">Notion OAuth</div>
+        <div class="detail">La base Notion de l'utilisateur est sa source de vérité · le système y écrit les résultats, ne les stocke pas en double</div>
+      </div>
+      <div class="archi-card">
+        <div class="role">Ingestion multi-source</div>
+        <div class="tech">6 loaders spécialisés</div>
+        <div class="detail">YouTube · Podcast (Transcript.com) · Web (Readability) · Google Drive · PDF · texte brut</div>
+      </div>
+    </div>
+
+    <p style="margin-top:6px;font-size:.8rem;color:#777;">Séparation des couches :</p>
+    <div class="sep-row">
+      <span class="sep-pill purple">Prompts — agents/*.md</span>
+      <span class="sep-pill gray">Logique — lib/qualification/ · lib/ingestion/</span>
+      <span class="sep-pill green">Données — Notion + Redis</span>
+      <span class="sep-pill orange">Orchestration — n8n + routes API</span>
+    </div>
+  </section>
+
+  <!-- ══ COMPLIANCE ══ -->
+  <section>
+    <h2>Où se loge la compliance</h2>
+    <p>La conformité est dans le <strong>design du scorer, pas en post-traitement</strong>. Elle bloque avant que le score OPAD soit calculé — pas après.</p>
+    <div class="compliance-row">
+      <div class="comp-item">
+        <div class="comp-badge red">Gate bloquant</div>
+        <div class="comp-body"><strong>RGPD, IA Act, PI</strong> — si l'un de ces trois scores ≤ 3, le contenu est rejeté immédiatement, sans calcul du score OPAD. La raison : un contenu non conforme ne doit jamais entrer dans le catalogue, quelle que soit sa qualité pédagogique.</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-badge orange">Revue humaine</div>
+        <div class="comp-body"><strong>Inclusion (a_inclusion ≤ 3)</strong> — déclenche une revue humaine obligatoire. Le LLM extrait le passage exact problématique (<code>flag_excerpt</code>). Un humain valide avant toute publication.</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-badge blue">PI dédiée</div>
+        <div class="comp-body">Routes <strong>/api/pi-sources</strong> et <strong>/api/pi-validate</strong> séparées pour la vérification propriété intellectuelle sur les sources — découplées du pipeline principal, activables indépendamment.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COÛTS ══ -->
+  <section>
+    <h2>Coûts estimés — projection à 1 000 contenus / semaine</h2>
+    <table class="cost-table">
+      <thead>
+        <tr><th>Service</th><th>Changement requis</th><th>Coût / mois</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>DeepSeek (scoring)</td><td>~3 000 tokens × 1 000 = 3M tokens/sem · +output → volume réel</td><td>+30 €</td></tr>
+        <tr><td>Groq (génération livrables)</td><td>Free tier (100k tokens/j) explose dès ~150 contenus/sem → passage Flex pay-per-token</td><td>~20 €</td></tr>
+        <tr><td>Transcript.com</td><td>Abonnement plat — podcasts illimités, plus de facturation à l'unité</td><td>10 €</td></tr>
+        <tr><td>Notion (API)</td><td>Business plan → rate limits ×5 (3 → 15 req/s) — indispensable pour que n8n poll plus fréquemment sans erreur 429</td><td>~16 €</td></tr>
+        <tr><td>Upstash Redis</td><td>Dépassement free tier à ~1 000 verrous/sem + cache transcripts</td><td>~10 €</td></tr>
+        <tr><td>n8n Cloud</td><td>Inchangé — poll plus fréquent possible une fois Notion Business activé</td><td>~20 €</td></tr>
+        <tr><td>Vercel (hébergement)</td><td>Stable</td><td>~20 €</td></tr>
+        <tr class="total"><td colspan="2"><strong>Total à 1 000 contenus / semaine</strong></td><td>~126 € / mois</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ══ LIMITES RÉGLEMENTAIRES ══ -->
+  <section>
+    <h2>Ce que le système ne peut pas faire seul</h2>
+    <p>La qualification automatique complète est <strong>impossible par design</strong> — pas un bug, une contrainte réglementaire. Deux gates ne peuvent pas être délégués à un LLM :</p>
+    <div class="compliance-row">
+      <div class="comp-item">
+        <div class="comp-badge red">IA Act</div>
+        <div class="comp-body">Tout contenu potentiellement généré par IA doit être signalé et <strong>validé par un humain</strong> avant diffusion en contexte de formation professionnelle. Le LLM détecte le signal — il ne peut pas certifier la transparence au sens réglementaire.</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-badge red">RGPD</div>
+        <div class="comp-body">Un modèle de langage peut détecter des patterns de données personnelles — il ne peut pas <strong>certifier la conformité</strong>. Cette certification reste une responsabilité humaine et juridique.</div>
+      </div>
+    </div>
+    <p style="margin-top:14px;">Ce que le système fait réellement : <strong>passer de ~45 min à ~3 min de revue par contenu</strong>. Il trie, détecte, documente, justifie. La revue humaine reste — mais ciblée sur les 20 à 30 % de cas ambigus, pas sur la totalité du flux.</p>
+  </section>
+
+  <!-- ══ SCALE ══ -->
+  <section>
+    <h2>3 points de rupture techniques à anticiper</h2>
+
+    <div class="scale-item">
+      <div class="scale-n">1</div>
+      <div class="scale-body">
+        <div class="title">Le polling n8n séquentiel devient un goulot</div>
+        <div class="desc">À 143 contenus/jour, le poll toutes les 2 min ne suit plus en séquentiel. Solution : <strong>file Redis (LPUSH/BRPOP)</strong> avec workers parallèles — Notion alimente la queue, plusieurs instances /api/intake consomment en parallèle. Notion Business déverrouille les rate limits nécessaires.</div>
+      </div>
+    </div>
+
+    <div class="scale-item">
+      <div class="scale-n">2</div>
+      <div class="scale-body">
+        <div class="title">Les APIs d'extraction sont des points de défaillance uniques</div>
+        <div class="desc">Transcript.com et YouTube Data API ont des pannes et des quotas. À volume, une source indisponible bloque tout le pipeline. Solution : <strong>retry exponentiel (3 tentatives)</strong> + fallback Whisper via Groq pour les podcasts + cache Redis 24h des transcripts déjà récupérés.</div>
+      </div>
+    </div>
+
+    <div class="scale-item">
+      <div class="scale-n">3</div>
+      <div class="scale-body">
+        <div class="title">Redis seul ne suffit pas pour l'historique de qualification</div>
+        <div class="desc">Les résultats de qualification sont précieux à volume (audit, re-scoring, eval set). Redis avec TTL n'est pas une base historique. Solution : migrer les résultats long-terme vers <strong>PostgreSQL (Neon ou Supabase)</strong>, Redis reste pour les verrous, sessions et cache chaud. Coût additionnel : ~10-15 €/mois.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Option B — Système agentique · Edflex Qualification · Tody Rafalimanana · 2026</footer>
+
+</div>
+</body>
+</html>

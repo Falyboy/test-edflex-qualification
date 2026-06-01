@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — Edflex Qualification</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0A0A0A;
+    color: #E0E0E0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 48px 32px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .accent { color: #FF6500; }
+
+  /* ── Layout colonnes ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ── Sections ── */
+  .layer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .layer-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #555;
+    margin-bottom: 10px;
+    align-self: flex-start;
+    padding-left: 4px;
+  }
+
+  /* ── Row de cards ── */
+  .row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  /* ── Card générique ── */
+  .card {
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 130px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #FF6500; }
+  .card .icon { font-size: 1.4rem; }
+  .card .name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #E0E0E0;
+    line-height: 1.3;
+  }
+  .card .sub {
+    font-size: 0.68rem;
+    color: #555;
+    line-height: 1.3;
+  }
+
+  /* Variantes couleur */
+  .card.orange  { border-color: #FF6500; background: #1a1108; }
+  .card.blue    { border-color: #2563eb; background: #0d1526; }
+  .card.green   { border-color: #16a34a; background: #0a1a10; }
+  .card.red     { border-color: #dc2626; background: #1a0a0a; }
+  .card.yellow  { border-color: #ca8a04; background: #1a1500; }
+  .card.purple  { border-color: #7c3aed; background: #130d1a; }
+  .card.gray    { border-color: #444;    background: #111; }
+
+  /* ── Connecteur vertical ── */
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 4px 0;
+  }
+  .connector .line {
+    width: 2px;
+    height: 28px;
+    background: linear-gradient(to bottom, #333, #444);
+  }
+  .connector .arrow {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #444;
+  }
+  .connector .label {
+    font-size: 0.65rem;
+    color: #FF6500;
+    font-weight: 600;
+    margin: -4px 0 2px;
+    letter-spacing: 0.05em;
+  }
+  .connector.orange .line  { background: linear-gradient(to bottom, #FF6500, #c44d00); }
+  .connector.orange .arrow { border-top-color: #c44d00; }
+  .connector.green .line   { background: linear-gradient(to bottom, #16a34a, #166534); }
+  .connector.green .arrow  { border-top-color: #166534; }
+
+  /* ── Zone routing ── */
+  .routing-box {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 20px 24px;
+    width: 100%;
+  }
+  .routing-box .title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .routing-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ── Box qualification ── */
+  .qual-box {
+    background: #0d1526;
+    border: 1px solid #2563eb;
+    border-radius: 12px;
+    padding: 20px 28px;
+    width: 100%;
+  }
+  .qual-box .title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #2563eb;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .axes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .axe {
+    background: #0a0f1e;
+    border: 1px solid #1e3a6e;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.7rem;
+    color: #93bbff;
+    font-weight: 500;
+  }
+  .axe.flag {
+    border-color: #dc2626;
+    background: #1a0a0a;
+    color: #f87171;
+  }
+
+  /* ── LLM badge ── */
+  .llm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1a1108;
+    border: 1px solid #FF6500;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #FF6500;
+    margin-top: 10px;
+  }
+
+  /* ── Agents ── */
+  .agents-box {
+    background: #130d1a;
+    border: 1px solid #7c3aed;
+    border-radius: 12px;
+    padding: 20px 24px;
+    width: 100%;
+  }
+  .agents-box .title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #7c3aed;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: #1a1a1a;
+    margin: 40px 0;
+  }
+
+  /* ── Légende ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #1a1a1a;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.72rem;
+    color: #666;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* big arrow multi-branch */
+  .split-arrows {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 6px 0;
+    height: 36px;
+  }
+  .split-arrows svg {
+    position: absolute;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Architecture <span class="accent">Edflex Qualification</span></h1>
+  <p>Pipeline qualification automatique de contenus pédagogiques · méthode OPAD · Option B — Système agentique</p>
+</header>
+
+<div class="flow">
+
+  <!-- ══ LAYER 1 : SOURCES ══ -->
+  <div class="layer">
+    <div class="layer-label">1 · Sources d'entrée</div>
+    <div class="row">
+      <div class="card gray">
+        <span class="icon">📋</span>
+        <span class="name">Notion DB</span>
+        <span class="sub">Source de vérité</span>
+      </div>
+      <div class="card gray">
+        <span class="icon">▶️</span>
+        <span class="name">YouTube</span>
+        <span class="sub">youtube-transcript</span>
+      </div>
+      <div class="card gray">
+        <span class="icon">🎙️</span>
+        <span class="name">Podcast</span>
+        <span class="sub">Transcript.com API</span>
+      </div>
+      <div class="card gray">
+        <span class="icon">🌐</span>
+        <span class="name">Web</span>
+        <span class="sub">@mozilla/readability</span>
+      </div>
+      <div class="card gray">
+        <span class="icon">📁</span>
+        <span class="name">Google Drive</span>
+        <span class="sub">Drive API v3</span>
+      </div>
+      <div class="card gray">
+        <span class="icon">📄</span>
+        <span class="name">Fichier</span>
+        <span class="sub">pdf-parse / texte</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- connector -->
+  <div class="connector">
+    <div class="line"></div>
+    <div class="arrow"></div>
+  </div>
+
+  <!-- ══ LAYER 2 : ORCHESTRATION ══ -->
+  <div class="layer">
+    <div class="layer-label">2 · Orchestration</div>
+    <div class="row">
+      <div class="card orange">
+        <span class="icon">⚙️</span>
+        <span class="name">n8n</span>
+        <span class="sub">Poll toutes les 2 min</span>
+      </div>
+      <div class="card orange">
+        <span class="icon">🔁</span>
+        <span class="name">POST /api/poll</span>
+        <span class="sub">x-n8n-secret · scan Redis</span>
+      </div>
+      <div class="card orange">
+        <span class="icon">🗄️</span>
+        <span class="name">Upstash Redis</span>
+        <span class="sub">tokens OAuth · verrou idempotency TTL 5min</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- connector -->
+  <div class="connector">
+    <div class="line"></div>
+    <div class="label">POST /api/intake par source</div>
+    <div class="arrow"></div>
+  </div>
+
+  <!-- ══ LAYER 3 : EXTRACTION ══ -->
+  <div class="layer">
+    <div class="layer-label">3 · Extraction &amp; détection</div>
+    <div class="row">
+      <div class="card blue">
+        <span class="icon">🔍</span>
+        <span class="name">detect.ts</span>
+        <span class="sub">détecte le type de source</span>
+      </div>
+      <div class="card blue">
+        <span class="icon">📝</span>
+        <span class="name">loader-youtube.ts</span>
+        <span class="sub">transcript + métadonnées</span>
+      </div>
+      <div class="card blue">
+        <span class="icon">📝</span>
+        <span class="name">loader-podcast.ts</span>
+        <span class="sub">MP3 / RSS → texte</span>
+      </div>
+      <div class="card blue">
+        <span class="icon">📝</span>
+        <span class="name">loader-web.ts</span>
+        <span class="sub">extraction article</span>
+      </div>
+      <div class="card blue">
+        <span class="icon">📝</span>
+        <span class="name">loader-gdrive.ts</span>
+        <span class="sub">Docs / Sheets / fichiers</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- connector -->
+  <div class="connector">
+    <div class="line"></div>
+    <div class="label">texte extrait → scorer</div>
+    <div class="arrow"></div>
+  </div>
+
+  <!-- ══ LAYER 4 : QUALIFICATION ══ -->
+  <div class="layer">
+    <div class="layer-label">4 · Qualification LLM · scorer-llm.ts</div>
+    <div class="qual-box">
+      <div class="title">Prompt OPAD structuré — retour JSON valide</div>
+      <div class="axes">
+        <span class="axe">🎯 Opérationnel</span>
+        <span class="axe">🛠️ Praticable</span>
+        <span class="axe">🌍 Accessible</span>
+        <span class="axe">🔁 Déclinable</span>
+        <span class="axe">📐 Format pédagogique</span>
+        <span class="axe">👥 Inclusion</span>
+        <span class="axe">🌐 Langue</span>
+        <span class="axe">🎯 Pertinence persona</span>
+        <span class="axe flag">🔒 RGPD</span>
+        <span class="axe flag">🤖 IA Act</span>
+        <span class="axe flag">⚠️ PI / sensibilité</span>
+      </div>
+      <div style="text-align:center">
+        <span class="llm-badge">⚡ DeepSeek · deepseek-chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- connector -->
+  <div class="connector orange">
+    <div class="line"></div>
+    <div class="label">score + drapeaux → routing</div>
+    <div class="arrow"></div>
+  </div>
+
+  <!-- ══ LAYER 5 : ROUTING ══ -->
+  <div class="layer">
+    <div class="layer-label">5 · Routage des résultats</div>
+    <div class="routing-box">
+      <div class="title">Décision automatique · écriture dans Notion</div>
+      <div class="routing-row">
+        <div class="card green">
+          <span class="icon">✅</span>
+          <span class="name">Publier</span>
+          <span class="sub">score ≥ 7 · aucun flag</span>
+        </div>
+        <div class="card yellow">
+          <span class="icon">✏️</span>
+          <span class="name">Réviser</span>
+          <span class="sub">score 4–6 · à améliorer</span>
+        </div>
+        <div class="card red">
+          <span class="icon">❌</span>
+          <span class="name">Rejeter</span>
+          <span class="sub">score &lt; 4 · hors sujet</span>
+        </div>
+        <div class="card orange">
+          <span class="icon">👁️</span>
+          <span class="name">Revue humaine</span>
+          <span class="sub">drapeau RGPD / IA Act / PI levé</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- connector -->
+  <div class="connector green">
+    <div class="line"></div>
+    <div class="label">sources qualifiées → génération</div>
+    <div class="arrow"></div>
+  </div>
+
+  <!-- ══ LAYER 6 : AGENTS GÉNÉRATION ══ -->
+  <div class="layer">
+    <div class="layer-label">6 · Agents génération livrables · agents/*.md chargés au runtime</div>
+    <div class="agents-box">
+      <div class="title">6 agents · prompts externalisés en fichiers Markdown</div>
+      <div class="row">
+        <div class="card purple">
+          <span class="icon">🗺️</span>
+          <span class="name">Carte Conceptuelle</span>
+          <span class="sub">AGENT_CARTE_CONCEPTUELLE.md</span>
+        </div>
+        <div class="card purple">
+          <span class="icon">📚</span>
+          <span class="name">Module E-Learning</span>
+          <span class="sub">AGENT_CONTENU.md</span>
+        </div>
+        <div class="card purple">
+          <span class="icon">📋</span>
+          <span class="name">Fiche Outil</span>
+          <span class="sub">AGENT_CURATION.md</span>
+        </div>
+        <div class="card purple">
+          <span class="icon">🎭</span>
+          <span class="name">Scénario Roleplay</span>
+          <span class="sub">AGENT_ROLEPLAY.md</span>
+        </div>
+        <div class="card purple">
+          <span class="icon">📊</span>
+          <span class="name">Bilan Sources</span>
+          <span class="sub">AGENT_BILAN_SOURCES.md</span>
+        </div>
+        <div class="card purple">
+          <span class="icon">❓</span>
+          <span class="name">Quiz</span>
+          <span class="sub">AGENT_QUIZ.md</span>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:12px;">
+        <span class="llm-badge" style="border-color:#7c3aed; color:#a78bfa; background:#0d0a1a;">⚡ Groq · llama-3.3-70b &nbsp;|&nbsp; DeepSeek · deepseek-chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LÉGENDE SÉPARATION ══ -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#FF6500"></div>
+      Orchestration (n8n · routes API)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#2563eb"></div>
+      Données (loaders · extraction)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#7c3aed"></div>
+      Prompts LLM (agents/*.md externalisés)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#16a34a"></div>
+      Sortie Notion (3 tables)
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#dc2626"></div>
+      Drapeaux conformité (RGPD · IA Act · PI)
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

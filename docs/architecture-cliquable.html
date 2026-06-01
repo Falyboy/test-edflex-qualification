@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture Cliquable — Edflex Qualification</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0A0A0A; color:#E0E0E0; font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; padding:48px 24px; }
+
+header { text-align:center; margin-bottom:52px; }
+header h1 { font-size:1.55rem; font-weight:700; color:#fff; letter-spacing:-.02em; }
+header p { margin-top:8px; font-size:.82rem; color:#555; }
+header .hint { margin-top:12px; font-size:.75rem; color:#FF6500; background:#1a0f00; border:1px solid #FF650044; border-radius:20px; display:inline-block; padding:5px 14px; }
+.accent { color:#FF6500; }
+
+/* ── Layout ── */
+.flow { display:flex; flex-direction:column; align-items:center; max-width:920px; margin:0 auto; }
+
+.layer { width:100%; display:flex; flex-direction:column; align-items:center; }
+.layer-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:#444; margin-bottom:10px; align-self:flex-start; padding-left:4px; }
+
+.row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; width:100%; }
+
+/* ── Cards ── */
+.card { background:#161616; border:1px solid #222; border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; align-items:center; gap:5px; min-width:128px; text-align:center; transition:border-color .2s, transform .15s; }
+.card .icon { font-size:1.3rem; }
+.card .name { font-size:.76rem; font-weight:600; color:#E0E0E0; line-height:1.3; }
+.card .sub { font-size:.65rem; color:#555; line-height:1.3; }
+
+.card.clickable { cursor:pointer; }
+.card.clickable:hover { transform:translateY(-2px); }
+
+.card.orange  { border-color:#FF6500; background:#1a1108; }
+.card.blue    { border-color:#2563eb; background:#0d1526; }
+.card.green   { border-color:#16a34a; background:#0a1a10; }
+.card.red     { border-color:#dc2626; background:#1a0a0a; }
+.card.yellow  { border-color:#ca8a04; background:#1a1500; }
+.card.purple  { border-color:#7c3aed; background:#130d1a; }
+.card.gray    { border-color:#333; background:#111; }
+
+.card.green.clickable:hover  { border-color:#22c55e; box-shadow:0 0 12px #16a34a33; }
+.card.red.clickable:hover    { border-color:#ef4444; box-shadow:0 0 12px #dc262633; }
+.card.yellow.clickable:hover { border-color:#eab308; box-shadow:0 0 12px #ca8a0433; }
+.card.orange.clickable:hover { border-color:#ff8c3a; box-shadow:0 0 12px #FF650033; }
+.card.purple.clickable:hover { border-color:#a78bfa; box-shadow:0 0 12px #7c3aed33; }
+.card.blue.clickable:hover   { border-color:#60a5fa; box-shadow:0 0 12px #2563eb33; }
+
+/* ── Connector ── */
+.connector { display:flex; flex-direction:column; align-items:center; margin:4px 0; }
+.connector .line { width:2px; height:28px; background:linear-gradient(to bottom,#333,#444); }
+.connector .arrow { width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:8px solid #444; }
+.connector .label { font-size:.63rem; color:#FF6500; font-weight:600; margin:-3px 0 2px; letter-spacing:.05em; }
+.connector.orange .line { background:linear-gradient(to bottom,#FF6500,#c44d00); }
+.connector.orange .arrow { border-top-color:#c44d00; }
+.connector.green .line { background:linear-gradient(to bottom,#16a34a,#166534); }
+.connector.green .arrow { border-top-color:#166534; }
+
+/* ── Qual box ── */
+.qual-box { background:#0d1526; border:1px solid #2563eb; border-radius:12px; padding:20px 24px; width:100%; }
+.qual-box .title { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#2563eb; margin-bottom:14px; text-align:center; }
+.axes { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.axe { background:#0a0f1e; border:1px solid #1e3a6e; border-radius:6px; padding:6px 13px; font-size:.7rem; color:#93bbff; font-weight:500; cursor:pointer; transition:background .15s, border-color .2s, transform .15s; }
+.axe:hover { background:#0f1a38; border-color:#2563eb; transform:translateY(-1px); }
+.axe.flag { border-color:#dc2626; background:#1a0a0a; color:#f87171; }
+.axe.flag:hover { background:#2a0d0d; border-color:#ef4444; }
+
+.llm-badge { display:inline-flex; align-items:center; gap:6px; background:#1a1108; border:1px solid #FF6500; border-radius:20px; padding:5px 14px; font-size:.72rem; font-weight:600; color:#FF6500; margin-top:10px; cursor:pointer; transition:background .15s; }
+.llm-badge:hover { background:#2a1c0a; }
+
+/* ── Routing box ── */
+.routing-box { background:#111; border:1px solid #333; border-radius:12px; padding:20px 24px; width:100%; }
+.routing-box .title { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#555; margin-bottom:14px; text-align:center; }
+.routing-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+/* ── Agents box ── */
+.agents-box { background:#130d1a; border:1px solid #7c3aed; border-radius:12px; padding:20px 24px; width:100%; }
+.agents-box .title { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#7c3aed; margin-bottom:14px; text-align:center; }
+.llm-badge.purple { border-color:#7c3aed; color:#a78bfa; background:#0d0a1a; }
+.llm-badge.purple:hover { background:#170f2a; }
+
+/* ── Click hint badge ── */
+.click-hint { font-size:.6rem; color:#FF650099; margin-top:4px; }
+
+/* ── Legend ── */
+.legend { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-top:48px; padding-top:22px; border-top:1px solid #1a1a1a; }
+.legend-item { display:flex; align-items:center; gap:7px; font-size:.7rem; color:#555; }
+.legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.overlay { display:none; position:fixed; inset:0; background:#000000cc; z-index:100; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(3px); }
+.overlay.open { display:flex; }
+
+.modal { background:#111; border:1px solid #FF6500; border-radius:14px; width:100%; max-width:660px; max-height:88vh; display:flex; flex-direction:column; animation:slideUp .2s ease; }
+@keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+.modal-header { display:flex; align-items:flex-start; justify-content:space-between; padding:20px 22px 14px; border-bottom:1px solid #1e1e1e; gap:12px; }
+.modal-header .mtitle { font-size:.95rem; font-weight:700; color:#fff; line-height:1.3; }
+.modal-header .mbadge { font-size:.62rem; font-weight:600; background:#1a1108; border:1px solid #FF650066; color:#FF6500; border-radius:12px; padding:3px 10px; white-space:nowrap; margin-top:2px; }
+.modal-close { background:none; border:none; color:#555; font-size:1.2rem; cursor:pointer; padding:2px 6px; border-radius:6px; flex-shrink:0; line-height:1; }
+.modal-close:hover { color:#E0E0E0; background:#1e1e1e; }
+
+.modal-body { overflow-y:auto; padding:18px 22px; flex:1; }
+
+/* content blocks */
+.prompt-block { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:8px; padding:14px 16px; margin-bottom:12px; }
+.prompt-block .block-title { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#FF6500; margin-bottom:10px; }
+.prompt-block p, .prompt-block li { font-size:.78rem; color:#C0C0C0; line-height:1.65; }
+.prompt-block ul, .prompt-block ol { padding-left:18px; }
+.prompt-block li { margin-bottom:4px; }
+.prompt-block .scale { font-size:.7rem; color:#666; font-style:italic; margin-bottom:8px; }
+.prompt-block code { font-family:'Courier New',monospace; background:#1a1a1a; color:#93bbff; padding:2px 6px; border-radius:4px; font-size:.75rem; }
+.prompt-block strong { color:#E0E0E0; }
+
+/* formula */
+.formula { background:#0a1a10; border:1px solid #16a34a44; border-radius:8px; padding:12px 16px; margin-bottom:12px; font-size:.78rem; color:#86efac; font-family:'Courier New',monospace; line-height:1.8; }
+.formula .comment { color:#555; }
+
+/* voir plus */
+.voir-plus-wrap { position:relative; }
+.voir-plus-wrap .collapsed { max-height:200px; overflow:hidden; }
+.voir-plus-wrap .collapsed::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to bottom,transparent,#0d0d0d); pointer-events:none; }
+.voir-plus-btn { display:block; margin:8px auto 0; font-size:.72rem; color:#FF6500; background:none; border:1px solid #FF650055; border-radius:12px; padding:5px 16px; cursor:pointer; transition:background .15s; }
+.voir-plus-btn:hover { background:#1a0f00; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Architecture <span class="accent">Edflex Qualification</span></h1>
+  <p>Pipeline qualification automatique · méthode OPAD · Option B — Système agentique</p>
+  <span class="hint">👆 Clique sur les éléments des étapes 4, 5 et 6 pour voir les prompts réels</span>
+</header>
+
+<div class="flow">
+
+  <!-- ══ 1 · SOURCES ══ -->
+  <div class="layer">
+    <div class="layer-label">1 · Sources d'entrée</div>
+    <div class="row">
+      <div class="card gray"><span class="icon">📋</span><span class="name">Notion DB</span><span class="sub">Source de vérité</span></div>
+      <div class="card gray"><span class="icon">▶️</span><span class="name">YouTube</span><span class="sub">youtube-transcript</span></div>
+      <div class="card gray"><span class="icon">🎙️</span><span class="name">Podcast</span><span class="sub">Transcript.com API</span></div>
+      <div class="card gray"><span class="icon">🌐</span><span class="name">Web</span><span class="sub">@mozilla/readability</span></div>
+      <div class="card gray"><span class="icon">📁</span><span class="name">Google Drive</span><span class="sub">Drive API v3</span></div>
+      <div class="card gray"><span class="icon">📄</span><span class="name">Fichier</span><span class="sub">pdf-parse / texte</span></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><div class="arrow"></div></div>
+
+  <!-- ══ 2 · ORCHESTRATION ══ -->
+  <div class="layer">
+    <div class="layer-label">2 · Orchestration</div>
+    <div class="row">
+      <div class="card orange"><span class="icon">⚙️</span><span class="name">n8n</span><span class="sub">Poll toutes les 2 min</span></div>
+      <div class="card orange"><span class="icon">🔁</span><span class="name">POST /api/poll</span><span class="sub">x-n8n-secret · scan Redis</span></div>
+      <div class="card orange"><span class="icon">🗄️</span><span class="name">Upstash Redis</span><span class="sub">tokens OAuth · verrou idempotency TTL 5min</span></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><div class="label">POST /api/intake par source</div><div class="arrow"></div></div>
+
+  <!-- ══ 3 · EXTRACTION ══ -->
+  <div class="layer">
+    <div class="layer-label">3 · Extraction &amp; détection</div>
+    <div class="row">
+      <div class="card blue"><span class="icon">🔍</span><span class="name">detect.ts</span><span class="sub">type de source</span></div>
+      <div class="card blue"><span class="icon">📝</span><span class="name">loader-youtube</span><span class="sub">transcript + métadonnées</span></div>
+      <div class="card blue"><span class="icon">📝</span><span class="name">loader-podcast</span><span class="sub">MP3 / RSS → texte</span></div>
+      <div class="card blue"><span class="icon">📝</span><span class="name">loader-web</span><span class="sub">extraction article</span></div>
+      <div class="card blue"><span class="icon">📝</span><span class="name">loader-gdrive</span><span class="sub">Docs / Sheets / fichiers</span></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="line"></div><div class="label">texte extrait → scorer</div><div class="arrow"></div></div>
+
+  <!-- ══ 4 · QUALIFICATION ══ -->
+  <div class="layer">
+    <div class="layer-label">4 · Qualification LLM · scorer-llm.ts &nbsp;— <span style="color:#FF6500">clique sur un axe</span></div>
+    <div class="qual-box">
+      <div class="title">Prompt OPAD structuré · retour JSON valide · DeepSeek</div>
+      <div class="axes">
+        <span class="axe" onclick="openModal('o')">🎯 Originalité (O)</span>
+        <span class="axe" onclick="openModal('p')">🛠️ Pédagogie (P)</span>
+        <span class="axe" onclick="openModal('a_forme')">📐 Accessibilité structurelle (A)</span>
+        <span class="axe" onclick="openModal('a_inclusion')">👥 Inclusion (A)</span>
+        <span class="axe" onclick="openModal('d')">🎨 Design (D)</span>
+        <span class="axe flag" onclick="openModal('rgpd')">🔒 RGPD</span>
+        <span class="axe flag" onclick="openModal('ia_act')">🤖 IA Act</span>
+        <span class="axe flag" onclick="openModal('pi')">⚠️ PI</span>
+      </div>
+      <div style="text-align:center">
+        <span class="llm-badge" onclick="openModal('output_format')">⚡ DeepSeek · voir format de sortie JSON →</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector orange"><div class="line"></div><div class="label">score + drapeaux → routing</div><div class="arrow"></div></div>
+
+  <!-- ══ 5 · ROUTING ══ -->
+  <div class="layer">
+    <div class="layer-label">5 · Routage des résultats &nbsp;— <span style="color:#FF6500">clique sur une décision</span></div>
+    <div class="routing-box">
+      <div class="title">Décision automatique · écriture dans Notion</div>
+      <div class="routing-row">
+        <div class="card green clickable" onclick="openModal('publier')">
+          <span class="icon">✅</span><span class="name">Publier</span><span class="sub">score ≥ 7 · aucun flag</span>
+          <span class="click-hint">voir règle →</span>
+        </div>
+        <div class="card yellow clickable" onclick="openModal('reviser')">
+          <span class="icon">✏️</span><span class="name">Réviser</span><span class="sub">score 5–6 · à améliorer</span>
+          <span class="click-hint">voir règle →</span>
+        </div>
+        <div class="card red clickable" onclick="openModal('rejeter')">
+          <span class="icon">❌</span><span class="name">Rejeter</span><span class="sub">score &lt; 5 · hors sujet</span>
+          <span class="click-hint">voir règle →</span>
+        </div>
+        <div class="card orange clickable" onclick="openModal('revue')">
+          <span class="icon">👁️</span><span class="name">Revue humaine</span><span class="sub">drapeau conformité levé</span>
+          <span class="click-hint">voir règle →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector green"><div class="line"></div><div class="label">sources qualifiées → génération</div><div class="arrow"></div></div>
+
+  <!-- ══ 6 · AGENTS ══ -->
+  <div class="layer">
+    <div class="layer-label">6 · Agents génération livrables · agents/*.md chargés au runtime &nbsp;— <span style="color:#FF6500">clique sur un agent</span></div>
+    <div class="agents-box">
+      <div class="title">6 agents · prompts externalisés en fichiers Markdown</div>
+      <div class="row">
+        <div class="card purple clickable" onclick="openModal('agent_carte')">
+          <span class="icon">🗺️</span><span class="name">Carte Conceptuelle</span><span class="sub">AGENT_CARTE_CONCEPTUELLE.md</span>
+          <span class="click-hint">voir prompt →</span>
+        </div>
+        <div class="card purple clickable" onclick="openModal('agent_contenu')">
+          <span class="icon">📚</span><span class="name">Module E-Learning</span><span class="sub">AGENT_CONTENU.md</span>
+          <span class="click-hint">voir prompt →</span>
+        </div>
+        <div class="card purple clickable" onclick="openModal('agent_curation')">
+          <span class="icon">📋</span><span class="name">Fiche Outil</span><span class="sub">AGENT_CURATION.md</span>
+          <span class="click-hint">voir prompt →</span>
+        </div>
+        <div class="card purple clickable" onclick="openModal('agent_roleplay')">
+          <span class="icon">🎭</span><span class="name">Scénario Roleplay</span><span class="sub">AGENT_ROLEPLAY.md</span>
+          <span class="click-hint">voir prompt →</span>
+        </div>
+        <div class="card purple clickable" onclick="openModal('agent_bilan')">
+          <span class="icon">📊</span><span class="name">Bilan Sources</span><span class="sub">AGENT_BILAN_SOURCES.md</span>
+          <span class="click-hint">voir prompt →</span>
+        </div>
+        <div class="card purple clickable" onclick="openModal('agent_quiz')">
+          <span class="icon">❓</span><span class="name">Quiz</span><span class="sub">AGENT_QUIZ.md</span>
+          <span class="click-hint">voir prompt →</span>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <span class="llm-badge purple">⚡ Groq · llama-3.3-70b &nbsp;|&nbsp; DeepSeek · deepseek-chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Légende -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#FF6500"></div>Orchestration (n8n · API)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Données (loaders · extraction)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div>Prompts LLM (agents/*.md)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>Sortie Notion (3 tables)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div>Conformité (RGPD · IA Act · PI)</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL
+══════════════════════════════════════════ -->
+<div class="overlay" id="overlay" onclick="closeOnOverlay(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="mtitle" id="modal-title">Titre</div>
+        <div class="mbadge" id="modal-badge">badge</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const DATA = {
+
+  // ── SCORER : axes OPAD ────────────────────────────────────────────────────
+
+  o: {
+    title: 'Axe O — Originalité',
+    badge: 'scorer-llm.ts · DeepSeek',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle de cet axe</div>
+        <p>Évalue la qualité de la source — fiabilité, angle éditorial, traçabilité, respect de la propriété intellectuelle.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Échelle</div>
+        <p class="scale">0-4 = Inadéquat · 6 = À réviser · 8 = Satisfaisant · 10 = Excellent</p>
+        <p><strong>Score final O = synthèse des 10 critères ci-dessous.</strong></p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">10 critères d'évaluation</div>
+        <ol>
+          <li><strong>Source identifiable</strong> — auteur absent/douteux → auteur/éditeur clair et traçable</li>
+          <li><strong>Fiabilité</strong> — peu fiable ou incohérente → source solide et reconnue</li>
+          <li><strong>Originalité / non-reproduction</strong> — copier-coller manifeste → angle réellement nouveau</li>
+          <li><strong>Angle personnel identifiable</strong> — texte impersonnel → point de vue assumé et pertinent</li>
+          <li><strong>Pas de simple compilation</strong> — compilation brute → synthèse éditoriale forte avec fil directeur</li>
+          <li><strong>Profondeur équilibrée</strong> — trop léger ou trop exhaustif → niveau très maîtrisé et homogène</li>
+          <li><strong>Contenu distinct et non répétitif</strong> — redondant → contenu très bien ciblé</li>
+          <li><strong>Sources citées (PI)</strong> — aucune source → sources variées et explicites</li>
+          <li><strong>Transparence d'origine (PI)</strong> — impossible à établir → traçabilité explicite de bout en bout</li>
+          <li><strong>Respect citations/licences (PI)</strong> — absence ou violation → références complètes, licences claires</li>
+        </ol>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Poids dans le score final</div>
+        <p>O × <strong>0.25</strong> (25 % du score qualité global)</p>
+      </div>`
+  },
+
+  p: {
+    title: 'Axe P — Pédagogie',
+    badge: 'scorer-llm.ts · DeepSeek',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle de cet axe</div>
+        <p>Évalue l'adéquation pédagogique avec le public cible, la progression, les exemples terrain, l'invitation à agir.</p>
+        <p style="margin-top:8px;color:#FF6500;font-size:.73rem;">⚡ Si un contexte projet est fourni (secteur, métier, problèmes), chaque critère est réévalué en fonction de ce contexte.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Échelle</div>
+        <p class="scale">0-4 = Inadéquat · 6 = À réviser · 8 = Satisfaisant · 10 = Excellent</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">11 critères d'évaluation</div>
+        <ol>
+          <li><strong>Pertinence persona</strong> — surcharge cognitive/jargon → très lisible et adapté au public</li>
+          <li><strong>Applicabilité terrain</strong> — purement théorique → très orienté terrain, concret, orienté action</li>
+          <li><strong>Alignement besoin projet</strong> — hors sujet → parfaitement aligné avec l'objectif déclaré</li>
+          <li><strong>Clarté de l'objectif</strong> — flou ou absent → précis et mesurable</li>
+          <li><strong>Niveau Bloom</strong> — non cohérent → parfaitement calibré au résultat attendu</li>
+          <li><strong>Enchaînement logique</strong> — confus → très fluide (problème → explication → exemple → conclusion)</li>
+          <li><strong>Progression général → concret</strong> — trop abstrait → très fluide</li>
+          <li><strong>Cohérence des niveaux</strong> — saut de niveau gênant → progression stable</li>
+          <li><strong>Exemples pédagogiques</strong> — aucun exemple → exemples excellents</li>
+          <li><strong>Invitation à agir</strong> — aucune action → incitation forte et utile</li>
+          <li><strong>Références à l'objectif d'apprentissage</strong> — aucune → références pédagogiques fortes</li>
+        </ol>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Poids dans le score final</div>
+        <p>P × <strong>0.35</strong> — axe le plus important (35 % du score qualité global)</p>
+      </div>`
+  },
+
+  a_forme: {
+    title: 'Axe A — Accessibilité structurelle',
+    badge: 'scorer-llm.ts · DeepSeek',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle de cet axe</div>
+        <p>Évalue si le contenu est lisible et utilisable sans dépendance visuelle — critique pour les deskless workers sur smartphone.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Échelle</div>
+        <p class="scale">0-4 = Inadéquat · 6 = À réviser · 8 = Satisfaisant · 10 = Excellent</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">7 critères d'évaluation</div>
+        <ol>
+          <li><strong>Lisibilité / charge cognitive</strong> — surcharge → lecture immédiate, phrases courtes</li>
+          <li><strong>Format et intégrité du contenu</strong> — texte cassé ou tronqué → texte impeccable et complet</li>
+          <li><strong>Compréhensibilité immédiate</strong> — difficile → compréhension instantanée</li>
+          <li><strong>Éléments visuels décrits verbalement</strong> — dépendance au visuel → description très claire</li>
+          <li><strong>Références écran explicites</strong> — ambiguë ou absente → parfaitement explicite</li>
+          <li><strong>Consignes sans dépendre du visuel</strong> — impossible sans écran → immédiatement applicables</li>
+          <li><strong>Questionnaire de cadrage suffisant</strong> — cadrage insuffisant → cadrage très complet</li>
+        </ol>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Poids dans le score final</div>
+        <p>A = (a_forme + a_inclusion) / 2 × <strong>0.25</strong> (25 % du score qualité global)</p>
+      </div>`
+  },
+
+  a_inclusion: {
+    title: 'Axe A — Accessibilité inclusive',
+    badge: 'scorer-llm.ts · DeepSeek · ⚠️ gate critique',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle de cet axe</div>
+        <p>Évalue l'absence de biais, stéréotypes, moqueries ou traitements irresponsables de sujets sensibles.</p>
+        <p style="margin-top:8px;color:#f87171;font-size:.73rem;">⛔ Si score ≤ 3 → déclenchement automatique d'une <strong>Revue humaine</strong>, quelle que soit la note globale.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Échelle</div>
+        <p class="scale">0-4 = Inadéquat · 6 = À réviser · 8 = Satisfaisant · 10 = Excellent</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">9 critères d'évaluation</div>
+        <ol>
+          <li><strong>Moqueries sur genre, origine, religion, handicap</strong> — dénigrement ciblé → respect total</li>
+          <li><strong>Stéréotypes grossiers</strong> — stéréotypes explicites → représentation équilibrée</li>
+          <li><strong>Représentation déséquilibrée</strong> — même groupe toujours en défaut → très bon équilibre</li>
+          <li><strong>Ton humiliant ou dénigrant</strong> — humiliant → très respectueux et neutre</li>
+          <li><strong>Blagues sur situations dramatiques</strong> — punchline déplacée → très bien cadré</li>
+          <li><strong>Sujet sensible sans précaution</strong> — trivialisation → traitement très prudent</li>
+          <li><strong>Absence de mise en garde</strong> — aucun avertissement → avertissement clair et utile</li>
+          <li><strong>Reconnaissance des biais</strong> — moralisateur ou fermé → réflexivité forte</li>
+          <li><strong>Posture réflexive</strong> — aucune nuance → très bonne posture réflexive</li>
+        </ol>
+      </div>`
+  },
+
+  d: {
+    title: 'Axe D — Design pédagogique',
+    badge: 'scorer-llm.ts · DeepSeek',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle de cet axe</div>
+        <p>Évalue l'ergonomie, la fluidité et l'adaptation au format mobile/terrain du contenu.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Échelle</div>
+        <p class="scale">0-4 = Inadéquat · 6 = À réviser · 8 = Satisfaisant · 10 = Excellent</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">8 critères d'évaluation</div>
+        <ol>
+          <li><strong>Expérience fluide</strong> — confuse ou lourde → très fluide, aucun frottement</li>
+          <li><strong>Ergonomie mobile / terrain</strong> — inadapté → excellente ergonomie smartphone</li>
+          <li><strong>Structure visuelle</strong> — illisible → très claire et hiérarchisée</li>
+          <li><strong>Adaptation au format du module</strong> — incompatible → parfaite adaptation</li>
+          <li><strong>Narrateur oriente l'attention</strong> — aucune guidance → guidage très efficace</li>
+          <li><strong>Idée clé complétée verbalement</strong> — non expliqué → systématique et exemplaire</li>
+          <li><strong>Une zone / un élément à la fois</strong> — tout mélangé → découpage très progressif</li>
+          <li><strong>Adaptation au type de support</strong> — mal pris en compte → adaptation parfaite</li>
+        </ol>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Poids dans le score final</div>
+        <p>D × <strong>0.15</strong> (15 % du score qualité global)</p>
+      </div>`
+  },
+
+  rgpd: {
+    title: 'Gate RGPD — Conformité données personnelles',
+    badge: 'Gate bloquant · scorer-llm.ts',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Ce que le LLM évalue</div>
+        <ul>
+          <li>Le contenu évoque-t-il des données personnelles identifiantes ?</li>
+          <li>Y a-t-il du tracking, du profilage ou de la collecte de données décrites sans cadre légal ?</li>
+          <li>La conformité GDPR est-elle respectée dans les exemples ou outils mentionnés ?</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règle de décision</div>
+        <p style="color:#f87171;"><strong>⛔ Si score RGPD ≤ 3 → Rejet automatique, sans calcul du score global.</strong></p>
+        <p style="margin-top:6px;">Score 4–10 → gate passée, le scoring OPAD continue normalement.</p>
+      </div>`
+  },
+
+  ia_act: {
+    title: 'Gate IA Act — Conformité réglementaire IA',
+    badge: 'Gate bloquant · scorer-llm.ts',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Ce que le LLM évalue</div>
+        <ul>
+          <li>Le contenu est-il transparent sur l'usage de l'IA (obligation IA Act) ?</li>
+          <li>Mentionne-t-il des biais algorithmiques sans les nommer ou les traiter ?</li>
+          <li>Décrit-il des risques liés à des systèmes IA sans mise en garde appropriée ?</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règle de décision</div>
+        <p style="color:#f87171;"><strong>⛔ Si score IA Act ≤ 3 → Rejet automatique, sans calcul du score global.</strong></p>
+      </div>`
+  },
+
+  pi: {
+    title: 'Gate PI — Propriété intellectuelle',
+    badge: 'Gate bloquant · scorer-llm.ts',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Ce que le LLM évalue</div>
+        <ul>
+          <li>Y a-t-il des signes de plagiat ou de reproduction non autorisée ?</li>
+          <li>Les droits d'auteur et licences sont-ils respectés ?</li>
+          <li>Note : distinct des critères O 8-10 qui scorent la <em>qualité</em> des citations — ici c'est la légalité.</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règle de décision</div>
+        <p style="color:#f87171;"><strong>⛔ Si score PI ≤ 3 → Rejet automatique, sans calcul du score global.</strong></p>
+      </div>`
+  },
+
+  output_format: {
+    title: 'Format de sortie JSON — scorer-llm.ts',
+    badge: 'Prompt système · DeepSeek',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Instruction donnée au LLM</div>
+        <p>Réponds <strong>UNIQUEMENT en JSON valide</strong>, sans texte autour.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Structure JSON attendue</div>
+        <code style="display:block;white-space:pre;font-size:.72rem;line-height:1.7;color:#93bbff;background:#0a0f1e;padding:12px;border-radius:6px;overflow-x:auto">{
+  "rgpd": 0-10,
+  "ia_act": 0-10,
+  "pi": 0-10,
+  "o": 0-10,
+  "p": 0-10,
+  "a_forme": 0-10,
+  "a_inclusion": 0-10,
+  "d": 0-10,
+  "langue": "fr|en|...",
+  "tags": ["tag1", "tag2", "tag3"],
+  "flag_excerpt": "passage problématique max 250 chars (si a_inclusion ≤ 4)",
+  "sujet_principal": "1 phrase, max 200 chars",
+  "niveau": "débutant|intermédiaire|expert",
+  "score_persona": 0-10,
+  "justification": "2-3 phrases, max 500 chars"
+}</code>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Garde-fous</div>
+        <ul>
+          <li>Température = <code>0</code> (sorties déterministes)</li>
+          <li>Texte tronqué à 50 000 caractères max avant envoi</li>
+          <li>Si JSON non parsable → erreur remontée, pas de fallback silencieux</li>
+          <li>Scores normalisés : <code>Math.min(10, Math.max(0, Math.round(score)))</code></li>
+        </ul>
+      </div>`
+  },
+
+  // ── ROUTING ───────────────────────────────────────────────────────────────
+
+  publier: {
+    title: '✅ Décision : Publier',
+    badge: 'computeDecision() · scorer-llm.ts',
+    content: `
+      <div class="formula">
+        <span class="comment">// Score global OPAD</span>
+        score_qualite = O×0.25 + P×0.35 + ((A_forme+A_inclusion)/2)×0.25 + D×0.15
+
+        <span class="comment">// Condition Publier</span>
+        bloquant = rgpd ≤ 3 || ia_act ≤ 3 || pi ≤ 3   → false
+        sensibilite_flag = a_inclusion ≤ 3               → false
+        score_qualite ≥ 7                                → <strong style="color:#22c55e">✅ PUBLIER</strong>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Ce que ça signifie</div>
+        <ul>
+          <li>Aucun gate de conformité n'est déclenché (RGPD, IA Act, PI tous > 3)</li>
+          <li>Aucun problème d'inclusion (a_inclusion > 3)</li>
+          <li>Score OPAD pondéré ≥ 7 / 10</li>
+          <li>Le contenu est poussé dans la table Notion <strong>Catalogue qualifié</strong></li>
+        </ul>
+      </div>`
+  },
+
+  reviser: {
+    title: '✏️ Décision : Réviser',
+    badge: 'computeDecision() · scorer-llm.ts',
+    content: `
+      <div class="formula">
+        score_qualite = O×0.25 + P×0.35 + ((A_forme+A_inclusion)/2)×0.25 + D×0.15
+
+        bloquant = false
+        sensibilite_flag = false
+        score_qualite ≥ 5 ET score_qualite &lt; 7   → <strong style="color:#eab308">✏️ RÉVISER</strong>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Ce que ça signifie</div>
+        <ul>
+          <li>Pas de problème de conformité — la source est acceptable</li>
+          <li>Score OPAD insuffisant pour publication directe (entre 5 et 7)</li>
+          <li>La justification du LLM indique les axes à améliorer</li>
+          <li>Le contenu va dans la table Notion <strong>Rejetés</strong> avec statut "Réviser"</li>
+        </ul>
+      </div>`
+  },
+
+  rejeter: {
+    title: '❌ Décision : Rejeter',
+    badge: 'computeDecision() · scorer-llm.ts',
+    content: `
+      <div class="formula">
+        <span class="comment">// Cas 1 — Gate conformité bloquant</span>
+        bloquant = rgpd ≤ 3 || ia_act ≤ 3 || pi ≤ 3   → <strong style="color:#ef4444">❌ REJETER</strong>
+        <span class="comment">// (indépendamment du score OPAD)</span>
+
+        <span class="comment">// Cas 2 — Score trop faible</span>
+        bloquant = false  ET  sensibilite_flag = false
+        score_qualite &lt; 5                              → <strong style="color:#ef4444">❌ REJETER</strong>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Ce que ça signifie</div>
+        <ul>
+          <li><strong>Rejet immédiat</strong> si RGPD, IA Act ou PI ≤ 3 — pas de calcul de score</li>
+          <li><strong>Rejet qualité</strong> si score OPAD < 5 malgré conformité OK</li>
+          <li>Le contenu va dans la table Notion <strong>Rejetés</strong> avec la raison</li>
+        </ul>
+      </div>`
+  },
+
+  revue: {
+    title: '👁️ Décision : Revue humaine',
+    badge: 'computeDecision() · scorer-llm.ts',
+    content: `
+      <div class="formula">
+        sensibilite_flag = a_inclusion ≤ 3
+
+        <span class="comment">// Priorité après le rejet bloquant</span>
+        bloquant = false
+        sensibilite_flag = <strong style="color:#FF6500">true</strong>   → <strong style="color:#FF6500">👁️ REVUE HUMAINE</strong>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Ce que ça signifie</div>
+        <ul>
+          <li>Aucun gate RGPD/IA Act/PI déclenché — pas un rejet automatique</li>
+          <li>Mais le contenu a un problème potentiel d'inclusion (a_inclusion ≤ 3)</li>
+          <li>Le LLM extrait le passage problématique dans <code>flag_excerpt</code> (max 250 chars)</li>
+          <li>Un humain doit valider avant toute publication</li>
+          <li>Le contenu va dans la table Notion <strong>Revue humaine</strong></li>
+        </ul>
+      </div>`
+  },
+
+  // ── AGENTS ────────────────────────────────────────────────────────────────
+
+  agent_carte: {
+    title: 'Agent — Carte Conceptuelle',
+    badge: 'AGENT_CARTE_CONCEPTUELLE.md · runtime fs.readFile',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle</div>
+        <p>Transforme les contenus qualifiés d'un projet en une carte conceptuelle Mermaid claire et pédagogique, adaptée aux deskless workers.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Mission</div>
+        <ul>
+          <li>Extraire les concepts principaux des transcripts</li>
+          <li>Regrouper les notions proches</li>
+          <li>Identifier les relations entre concepts</li>
+          <li>Adapter la hiérarchie au public, secteur et problème à résoudre</li>
+          <li>Produire une carte au format <strong>Mermaid</strong> + synthèse textuelle courte</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Inputs injectés automatiquement</div>
+        <ul>
+          <li><code>contenus</code> — transcripts sources qualifiées (YouTube, podcast, Drive)</li>
+          <li><code>public</code> — Q1 : public cible et prérequis</li>
+          <li><code>secteur</code> — Q2 : secteur d'activité</li>
+          <li><code>problemes</code> — Q3 : problèmes métier à résoudre</li>
+          <li><code>stade</code> — maturité du projet (En préparation / Déployé / Archivé)</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règle de robustesse</div>
+        <p>Si les contenus sont absents ou insuffisants → signaler clairement, ne pas inventer.</p>
+      </div>`
+  },
+
+  agent_contenu: {
+    title: 'Agent — Module E-Learning (OPAD)',
+    badge: 'AGENT_CONTENU.md · runtime fs.readFile · Groq',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle</div>
+        <p>Génère des modules de formation IA structurés en 4 sections OPAD, ancrés dans le contexte réel du projet et alimentés par les sources qualifiées.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Structure OPAD obligatoire</div>
+        <ul>
+          <li><strong>O — Objectif</strong> : 1 verbe Bloom calibré au stade (1-2 : Mémoriser/Comprendre · 3-4 : Appliquer/Analyser)</li>
+          <li><strong>P — Pratique</strong> : exercice guidé pas-à-pas, 30-50% de la durée totale</li>
+          <li><strong>A — Ancrage</strong> : cas concret métier issu du secteur, situation terrain réelle</li>
+          <li><strong>D — Déploiement</strong> : comment réutiliser la compétence dans le quotidien</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Priorité de lecture des inputs</div>
+        <ol>
+          <li>Brief E-Learning du Parcours Blended</li>
+          <li>Maquette Pédagogique (objectifs Bloom, public, prérequis, durée)</li>
+          <li>Sources qualifiées (max 5, tronquées à 20 000 chars chacune)</li>
+          <li>Paramètres manuels (fallback si aucun contexte projet)</li>
+        </ol>
+      </div>`
+  },
+
+  agent_curation: {
+    title: 'Agent — Fiche Outil IA',
+    badge: 'AGENT_CURATION.md · runtime fs.readFile · Groq',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle</div>
+        <p>Génère des fiches guides prêtes à remettre aux apprenants — utilisables immédiatement sur le terrain, sans formation supplémentaire.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Format de sortie strict</div>
+        <code style="display:block;white-space:pre;font-size:.72rem;line-height:1.7;color:#C0C0C0;background:#0a0a0a;padding:10px;border-radius:6px"># Fiche Outil — [Nom de l'outil]
+*[Département] · Stade [N] · [Public cible]*
+
+## En une phrase
+[max 20 mots, sans jargon]
+
+## Cas d'usage terrain (3 max)
+1. [Situation] — [Action] → [Résultat mesurable]
+
+## Première utilisation — 5 étapes max
+1. [Étape courte et actionnable]
+
+## À retenir
+[1-2 phrases, langage terrain]
+
+## Précautions
+[limites de l'outil, risques à connaître]</code>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règle d'ancrage</div>
+        <p>Si sources qualifiées disponibles → ancrer au moins 1 cas d'usage dans un exemple tiré du transcript.</p>
+      </div>`
+  },
+
+  agent_roleplay: {
+    title: 'Agent — Simulation Terrain (AILT)',
+    badge: 'AGENT_ROLEPLAY.md · runtime fs.readFile · Groq',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle</div>
+        <p>Génère des jeux de rôle structurés selon le framework AILT, centrés sur une compétence IA unique, utilisables en autoformation ou en animation présentielle.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Structure AILT obligatoire (4 parties dans l'ordre)</div>
+        <ul>
+          <li><strong>A — Amorce</strong> : situation déclenchante 3-5 phrases, deskless worker, tension claire, outil IA concerné</li>
+          <li><strong>I — Interaction</strong> : dialogue 4-8 échanges (linéaire ou mini-branching 2 chemins max), langage oral, max 2 phrases par réplique</li>
+          <li><strong>L — Levier</strong> : le moment pivot où l'apprenant utilise la compétence IA pour débloquer la situation</li>
+          <li><strong>T — Transfert</strong> : comment réutiliser cette compétence dans d'autres situations terrain</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règle clé</div>
+        <p><strong>Une simulation = une compétence IA unique.</strong> Pas de dispersion. Si sources disponibles → extraire une situation réelle comme point de départ de l'Amorce.</p>
+      </div>`
+  },
+
+  agent_bilan: {
+    title: 'Agent — Bilan Sources',
+    badge: 'AGENT_BILAN_SOURCES.md · runtime fs.readFile · DeepSeek',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle</div>
+        <p>Consolide les scores OPAD, RGPD, IA Act et PI de toutes les sources qualifiées et produit un bilan de décision lisible pour le formateur ou responsable pédagogique.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Structure de sortie (3 sections)</div>
+        <ol>
+          <li><strong>Tableau de bord</strong> — une ligne par source : titre · type · score global · décision · indicateurs RGPD/IA Act</li>
+          <li><strong>Sources prêtes à publier ✅</strong> — décision "Publier" · résumé des points forts</li>
+          <li><strong>Sources à retravailler ⚠️</strong> — décision "Réviser" ou "Rejeter" · raison principale + action recommandée</li>
+        </ol>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Ton</div>
+        <p>Factuel, direct, utile. Aucune reformulation de l'input. Chaque ligne apporte une information de décision. Scores entre parenthèses : <code>O:8 P:7 A:6 D:9</code>.</p>
+      </div>`
+  },
+
+  agent_quiz: {
+    title: 'Agent — Quiz Automatisé',
+    badge: 'AGENT_QUIZ.md · runtime fs.readFile · Groq',
+    content: `
+      <div class="prompt-block">
+        <div class="block-title">Rôle</div>
+        <p>Génère des QCM auto-corrigés avec feedback immédiat, calibrés sur les compétences enseignées, utilisables en autoformation après un module.</p>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Structure de sortie</div>
+        <ul>
+          <li>5 à 10 questions QCM selon le stade de maturité</li>
+          <li>3 ou 4 choix par question avec distracteurs crédibles</li>
+          <li>Feedback immédiat par réponse (correcte ET incorrecte) en langage terrain</li>
+          <li>Score final avec seuil de validation et message de conclusion</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Règles clés</div>
+        <ul>
+          <li><strong>Questions en situation terrain</strong>, pas en définition abstraite</li>
+          <li>Ex. correct : "Tu dois rédiger un rapport. Tu utilises ChatGPT — quelle est ta première action ?"</li>
+          <li>Vocabulaire issu du Glossaire Métier — jamais évaluer un terme non introduit</li>
+          <li><strong>Un quiz = un module ou une compétence.</strong> Pas un quiz sur toute la formation.</li>
+        </ul>
+      </div>
+      <div class="prompt-block">
+        <div class="block-title">Priorité de lecture des inputs</div>
+        <ol>
+          <li>Module E-Learning (contenu enseigné)</li>
+          <li>Scénario Pédagogique (verbes Bloom + compétences)</li>
+          <li>Questionnaire de positionnement (mesurer la progression)</li>
+          <li>Maquette Pédagogique (public, stade, durée)</li>
+          <li>Glossaire Métier (vocabulaire exact)</li>
+        </ol>
+      </div>`
+  }
+}
+
+// ── MODAL LOGIC ───────────────────────────────────────────────────────────────
+
+function openModal(key) {
+  const d = DATA[key]
+  if (!d) return
+  document.getElementById('modal-title').textContent = d.title
+  document.getElementById('modal-badge').textContent = d.badge
+  const body = document.getElementById('modal-body')
+  body.innerHTML = d.content
+
+  // Voir plus logic
+  const blocks = body.querySelectorAll('.prompt-block, .formula')
+  const totalH = Array.from(blocks).reduce((s, b) => s + b.offsetHeight, 0)
+
+  if (totalH > 280) {
+    const wrap = document.createElement('div')
+    wrap.className = 'voir-plus-wrap'
+    const inner = document.createElement('div')
+    inner.className = 'collapsed'
+    while (body.firstChild) inner.appendChild(body.firstChild)
+    wrap.appendChild(inner)
+    body.appendChild(wrap)
+
+    const btn = document.createElement('button')
+    btn.className = 'voir-plus-btn'
+    btn.textContent = '↓ Voir la suite'
+    let expanded = false
+    btn.onclick = () => {
+      expanded = !expanded
+      inner.className = expanded ? '' : 'collapsed'
+      btn.textContent = expanded ? '↑ Réduire' : '↓ Voir la suite'
+    }
+    wrap.appendChild(btn)
+  }
+
+  document.getElementById('overlay').classList.add('open')
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open')
+}
+
+function closeOnOverlay(e) {
+  if (e.target === document.getElementById('overlay')) closeModal()
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
+</script>
+
+</body>
+</html>
