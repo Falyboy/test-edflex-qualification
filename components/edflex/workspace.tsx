@@ -9,6 +9,9 @@ import { MAX_PROJECTS } from '@/lib/edflex/limits'
 import { SourcesNotionTable } from './sources-table'
 import { NotionRecreateButton } from './notion-recreate-button'
 import { renderLivrableHtml, livrableDownload } from '@/lib/edflex/render-livrable'
+import { NotionImportModal } from './notion-import-modal'
+import { NotionOpenButton } from './notion-open-button'
+import { DriveMonitorCard } from '@/components/dashboard/drive-monitor-card'
 
 function downloadLivrable(agent: string, content: string, label: string) {
   const { filename, content: body, mime } = livrableDownload(agent, content, label)
@@ -264,6 +267,7 @@ export function EdflexWorkspace({
   const [pickerErrors, setPickerErrors] = useState<Record<string, string>>({})
   const [generating, setGenerating] = useState(false)
   const [genError, setGenError] = useState<string | null>(null)
+  const [showNotionImport, setShowNotionImport] = useState(false)
   const fileRefsRef = useRef<Map<string, File>>(new Map())
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -286,8 +290,9 @@ export function EdflexWorkspace({
 
   const startPolling = useCallback(() => {
     if (pollingRef.current || !project) return
+    let ticks = 0
     pollingRef.current = setInterval(async () => {
-      if (!project) return
+      if (!project || ++ticks > 120) { stopPolling(); return } // 5 min max
       const res = await fetch(`/api/edflex/project/${project.id}`)
       if (!res.ok) return
       const d = await res.json()
@@ -338,7 +343,7 @@ export function EdflexWorkspace({
       // 1. Upload navigateur → Vercel Blob (pas de limite 4.5MB du body serverless)
       const { upload } = await import('@vercel/blob/client')
       const blob = await upload(file.name, file, {
-        access: 'public',
+        access: 'private',
         handleUploadUrl: '/api/edflex/blob-upload',
         multipart: true,
         contentType: file.type || undefined,
@@ -484,12 +489,35 @@ export function EdflexWorkspace({
                   sourceStatuses={pickerStatuses}
                   sourceErrors={pickerErrors}
                   disabled={generating}
-                  showNotion={true}
+                  showNotion={false}
                 />
-                <div className="flex justify-end">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowNotionImport(true)}
+                      disabled={generating}
+                      className="flex items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-4 py-1.5 text-sm font-medium text-zinc-700 hover:border-zinc-500 transition-colors disabled:opacity-40"
+                    >
+                      <span className="inline-flex items-center justify-center w-3.5 h-3.5 bg-zinc-900 rounded-sm text-white text-[10px] font-bold">N</span>
+                      Importer depuis Notion
+                    </button>
+                    <NotionOpenButton />
+                    <DriveMonitorCard compact />
+                  </div>
                   <NotionRecreateButton />
                 </div>
               </section>
+            )}
+
+            {showNotionImport && project && (
+              <NotionImportModal
+                projectId={project.id}
+                onImported={(newSources) => {
+                  setEdflexSources(prev => [...prev, ...(newSources as EdflexSource[])])
+                }}
+                onClose={() => setShowNotionImport(false)}
+              />
             )}
 
             {/* Sources en cours (transcription / qualification) */}

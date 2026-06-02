@@ -1,4 +1,4 @@
-export type SourceType = 'youtube' | 'file' | 'url' | 'text' | 'podcast' | 'gdrive'
+export type SourceType = 'youtube' | 'file' | 'url' | 'text' | 'podcast' | 'gdrive' | 'pdf'
 
 export interface IngestedDocument {
   sourceUrl: string

@@ -51,6 +51,32 @@ function rejectUnsupportedPlatform(url: string): void {
   if (host.includes('podcasts.apple.com')) throw new Error('Apple Podcasts non supporté. Utilisez l\'URL RSS du podcast ou un fichier MP3.')
 }
 
+async function resolveAushaEpisodePage(url: string): Promise<{ audioUrl: string; title: string }> {
+  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+  if (!res.ok) throw new Error(`Page Ausha inaccessible : ${res.status}`)
+  const html = await res.text()
+
+  // Ausha embed l'URL audio dans og:audio ou dans un attribut data-src/src sur <audio>
+  const ogAudio = html.match(/<meta[^>]+property=["']og:audio["'][^>]+content=["']([^"']+)["']/)
+    ?? html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:audio["']/)
+  if (ogAudio) {
+    assertSafeUrl(ogAudio[1])
+    const titleMatch = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/)
+      ?? html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/)
+    return { audioUrl: ogAudio[1], title: titleMatch ? titleMatch[1].trim() : 'Podcast Ausha' }
+  }
+
+  // Fallback : cherche une URL .mp3 dans le HTML
+  const mp3Match = html.match(/https?:\/\/[^"'\s]+\.mp3/)
+  if (mp3Match) {
+    assertSafeUrl(mp3Match[0])
+    const titleMatch = html.match(/<title>([^<]+)<\/title>/)
+    return { audioUrl: mp3Match[0], title: titleMatch ? titleMatch[1].trim() : 'Podcast Ausha' }
+  }
+
+  throw new Error('URL audio introuvable sur cette page Ausha. Utilisez le feed RSS : feed.ausha.co/<id>')
+}
+
 async function resolveAudioUrl(url: string): Promise<{ audioUrl: string; title: string }> {
   assertSafeUrl(url)
   rejectUnsupportedPlatform(url)
@@ -58,6 +84,12 @@ async function resolveAudioUrl(url: string): Promise<{ audioUrl: string; title: 
   if (isDirectAudio(url)) {
     const filename = new URL(url).pathname.split('/').pop() ?? 'podcast'
     return { audioUrl: url, title: filename.replace(/\.[^.]+$/, '') }
+  }
+
+  // Ausha episode page → scrape HTML pour URL audio
+  const host = new URL(url).hostname
+  if (host === 'podcast.ausha.co') {
+    return resolveAushaEpisodePage(url)
   }
 
   const res = await fetch(url)

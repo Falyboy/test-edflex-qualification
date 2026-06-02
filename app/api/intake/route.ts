@@ -4,6 +4,7 @@ import { put } from '@vercel/blob'
 import { loadYouTube } from '@/lib/ingestion/loader-youtube'
 import { loadPodcast } from '@/lib/ingestion/loader-podcast'
 import { loadGDrive } from '@/lib/ingestion/loader-gdrive'
+import { loadFile } from '@/lib/ingestion/loader-file'
 import { scoreLLM } from '@/lib/qualification/scorer-llm'
 import { detectSourceType } from '@/lib/ingestion/detect'
 
@@ -84,12 +85,6 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const sourceType = type ? type.toLowerCase() : detectSourceType(url)
 
-  // Valider type supporté avant tout accès Redis (évite "En cours" flash pour types inconnus)
-  const SUPPORTED_TYPES = ['youtube', 'podcast', 'gdrive']
-  if (!SUPPORTED_TYPES.includes(sourceType)) {
-    return NextResponse.json({ error: `Type de source non supporté : ${sourceType}` }, { status: 422 })
-  }
-
   // Récupérer token Notion user depuis Redis
   let userToken: string
   try {
@@ -99,6 +94,29 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!userToken) return NextResponse.json({ error: 'Token Notion invalide' }, { status: 401 })
   } catch {
     return NextResponse.json({ error: 'Token Notion invalide' }, { status: 401 })
+  }
+
+  // Valider type supporté — écrire erreur explicite dans Notion si non supporté
+  const SUPPORTED_TYPES = ['youtube', 'podcast', 'gdrive', 'pdf']
+  if (!SUPPORTED_TYPES.includes(sourceType)) {
+    const urlLower = url.toLowerCase()
+    let explication = `Type de source non reconnu (${sourceType}). `
+    if (urlLower.includes('viewer.html') || urlLower.includes('/web/viewer') || urlLower.includes('pdfjs')) {
+      explication = 'Cette URL pointe vers un viewer PDF (page HTML), pas vers un fichier PDF direct. Téléchargez le PDF manuellement et importez-le via "Importer des fichiers" dans l\'app.'
+    } else if (urlLower.includes('.ashx') || urlLower.includes('downloadhandler') || urlLower.includes('inline')) {
+      explication = 'Ce lien est un handler de téléchargement protégé — le PDF n\'est pas accessible directement. Téléchargez le fichier et importez-le via "Importer des fichiers" dans l\'app.'
+    } else if (urlLower.includes('instagram.com') || urlLower.includes('tiktok.com')) {
+      explication = 'Instagram et TikTok ne sont pas supportés. Utilisez YouTube, un podcast RSS, Google Drive, ou un PDF direct.'
+    } else if (urlLower.includes('spotify.com')) {
+      explication = 'Spotify n\'est pas supporté (DRM). Recherchez l\'URL RSS du podcast ou un fichier MP3 direct.'
+    } else {
+      explication += 'Formats supportés : YouTube, Podcast (RSS/MP3), Google Drive, PDF direct (.pdf). Pour un PDF derrière un viewer ou une authentification : téléchargez-le et importez-le via "Importer des fichiers".'
+    }
+    await patchNotionPage(notionPageId, userToken, {
+      'Statut': { select: { name: 'Erreur' } },
+      'Flags': { rich_text: [{ text: { content: explication.slice(0, 2000) } }] },
+    }).catch(() => null)
+    return NextResponse.json({ error: explication }, { status: 422 })
   }
 
   // HIGH: réserver quota atomiquement via INCR avant le travail
@@ -156,6 +174,14 @@ export async function POST(req: NextRequest): Promise<Response> {
       const meta = await loadGDrive(url, rawGoogleToken)
       title = meta.title
       text = meta.transcript.slice(0, MAX_TRANSCRIPT_CHARS)
+    } else if (sourceType === 'pdf') {
+      const pdfRes = await fetch(url)
+      if (!pdfRes.ok) throw new Error(`PDF inaccessible (${pdfRes.status})`)
+      const buffer = await pdfRes.arrayBuffer()
+      const filename = decodeURIComponent(new URL(url).pathname.split('/').pop() ?? 'document.pdf')
+      const doc = await loadFile(buffer, filename, 'application/pdf')
+      title = doc.title
+      text = doc.text.slice(0, MAX_TRANSCRIPT_CHARS)
     } else {
       throw new Error(`Type de source non supporté : ${sourceType}`)
     }
