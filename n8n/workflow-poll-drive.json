@@ -1,0 +1,46 @@
+{
+  "name": "Edflex — Poll Drive (fichiers, 2min)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [{ "field": "minutes", "minutesInterval": 2 }] }
+      },
+      "id": "schedule-drive",
+      "name": "Toutes les 2 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "__APP_BASE_URL__/api/drive/poll",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-n8n-secret", "value": "__N8N_SHARED_SECRET__" }
+          ]
+        },
+        "options": { "timeout": 55000 }
+      },
+      "id": "http-poll-drive",
+      "name": "POST /api/drive/poll",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Toutes les 2 minutes": {
+      "main": [[{ "node": "POST /api/drive/poll", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "_instructions": {
+    "role": "Pipeline Drive — déclenche le traitement des fichiers déposés dans le dossier Google Drive 'Formation-IA / À qualifier'. L'app télécharge, qualifie, écrit dans Notion et range le fichier dans Traités.",
+    "APP_BASE_URL": "URL de votre déploiement (ex: https://votre-app.vercel.app)",
+    "N8N_SHARED_SECRET": "Même valeur que la variable d'env N8N_SHARED_SECRET de l'app",
+    "import": "n8n → Workflows → Import from File → activer le workflow",
+    "prerequis": "L'utilisateur doit avoir connecté Google Drive + cliqué 'Activer Drive' sur la page Edflex (crée les dossiers)."
+  }
+}
